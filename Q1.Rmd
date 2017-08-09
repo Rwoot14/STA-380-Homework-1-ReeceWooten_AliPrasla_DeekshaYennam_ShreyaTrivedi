@@ -10,37 +10,70 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Part A.
+$RC = Random Choice Event$
 
-P(RC) = .3
-P(TC) = .7
-P(Y/RC) = .5
-P(Y n RC) = .15
-P(N n RC) = .15
-P(Y n TC) = .5
-P(Y/TC) = ??
+$TC = True Choice Event$
+
+$Y = "Yes" Choice Event$
+
+$N = "No" Choice Event$
+
+Solve for $P(Y/TC)$
+
+$P(Y/TC) = P(Y n TC) / P(TC)$
+
+$P(TC) = .7$
+
+$P(Y n TC) = P(Y) - P(Y n RC)$
+
+$P(Y) = .65$
+
+$P(Y n RC) = P(RC) * P(Y/RC)$
+
+$P(RC) = .3$
+
+$P(Y/RC) = .5$
+
+$P(Y n RC) = $
 ```{r}
-.5/.7
+YAndRC = .3 * .5
+YAndRC
+```
+
+$P(Y n TC) = $
+```{r}
+YAndTC = .65 - YAndRC
+YAndTC
+```
+
+Finally,
+
+$P(Y/TC) =  $
+```{r}
+YAndTC/.7
 ```
 
 ## Part B.
-P = Positive Test Event
-D = Has Disease Event
+$P$ = Positive Test Event
+$D$ = Has Disease Event
 
-P(D/P) = (P(P/D) * P(D))/P(P)
+Solve for $P(D/P)$
 
-Solve for P(D/P)
+$P(D/P) = (P(P/D) * P(D))/P(P)$
 
-P(P/D) = .993
-P(D) = .000025
-P(P) = P(P n D) + P(P n D^c)
 
-P(P n D) = P(P/D) * P(D)
+
+$P(P/D) =$ .993
+$P(D) = $.000025
+$P(P) = P(P n D) + P(P n D^c)$
+
+$P(P n D) = P(P/D) * P(D)$
 ```{r}
 PAndD = .993 * .000025
 ```
 
-P(P n D^c) = P(P/D^c) * P(D^c)
-P(P/D^c) = 1 - .9999
+$P(P n D^c) = P(P/D^c) * P(D^c)$
+$P(P/D^c) = 1 - .9999$
 ```{r}
 PAndNotD = (1-.9999) * (1-.000025)
 ```
