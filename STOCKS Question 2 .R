@@ -98,6 +98,8 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
     holdings = holdings + holdings*return.today
     total_wealth = sum(holdings)
     wealthtracker[today] = total_wealth
+    weights = c(.2, 0.3, 0.5, 0, 0)
+    holdings = weights * total_wealth
   }
   wealthtracker
 }
@@ -132,6 +134,8 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
     holdings = holdings + holdings*return.today
     total_wealth = sum(holdings)
     wealthtracker[today] = total_wealth
+    total_wealth = initial_wealth
+    weights = c(0, 0, 0, .9, .1)
   }
   wealthtracker
 }
@@ -150,60 +154,3 @@ quantile(sim1[,n_days], 0.05) - initial_wealth
 # END RISKY PORT
 ################
 
-
-
-
-
-
-
-
-
-
-
-
-##################
-#EXPERIMENTAL CODE
-##################
-c=seq(from=0, to=1,by=.05)
-
-weights=resample(c,5,replace=FALSE)
-
-initial_wealth = 10000
-
-sim_i=c(sim1,sim2)
-
-for i in 1:sim_i
-
-
-foreach(t=1:1) %do% {
-  weights=resample(c,5,replace=FALSE)
-  weight_tracker=rep(0,n_days)
-  sim <- paste("sim", t, sep = "")
-  assign(sim,foreach(i=1:5000, .combine='rbind') %do% {
-    total_wealth = initial_wealth
-    holdings = weights * total_wealth
-    n_days = 10
-    wealthtracker = rep(0, n_days)
-    for(today in 1:n_days) {
-      return.today = resample(all_returns, 1, orig.ids=FALSE)
-      holdings = holdings + holdings*return.today
-      total_wealth = sum(holdings)
-      wealthtracker[today] = total_wealth
-    }
-    weight_tracker=weights 
-    wealthtracker
-  })
-}
-
-
-
-d <- 5
-for(i in 1:10) { 
-  nam <- paste("B", i, sep = "")
-  assign(nam)
-}
-
-
-head(sim1)
-
-hist(sim1[,n_days], 25)
