@@ -1,0 +1,57 @@
+---
+title: "Modling Homework One"
+author: "Ali Prasla"
+date: "August 9, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part A.
+
+P(RC) = .3
+P(TC) = .7
+P(Y/RC) = .5
+P(Y n RC) = .15
+P(N n RC) = .15
+P(Y n TC) = .5
+P(Y/TC) = ??
+```{r}
+.5/.7
+```
+
+## Part B.
+P = Positive Test Event
+D = Has Disease Event
+
+P(D/P) = (P(P/D) * P(D))/P(P)
+
+Solve for P(D/P)
+
+P(P/D) = .993
+P(D) = .000025
+P(P) = P(P n D) + P(P n D^c)
+
+P(P n D) = P(P/D) * P(D)
+```{r}
+PAndD = .993 * .000025
+```
+
+P(P n D^c) = P(P/D^c) * P(D^c)
+P(P/D^c) = 1 - .9999
+```{r}
+PAndNotD = (1-.9999) * (1-.000025)
+```
+
+```{r}
+P = PAndD + PAndNotD
+```
+
+Print Final Probability:
+```{r}
+(.993 * .000025) / P
+```
+
+Yes. I foresee problems with universial testing. This test effectively has a 20% false positive rate. Yet, to determine whether or not to implement this policy, it is important to look at other factors, like the deadliness of the disease and the efficacy of early treatment. 
