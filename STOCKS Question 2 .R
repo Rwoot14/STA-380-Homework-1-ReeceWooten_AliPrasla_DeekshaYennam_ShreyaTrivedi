@@ -8,7 +8,7 @@ library(foreach)
 
 # Import a few stocks
 mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
-getSymbols(mystocks)
+myprices = getSymbols(mystocks, from = "2007-01-01")
 
 # Adjust for splits and dividends
 SPYa = adjustOHLC(SPY)
@@ -19,7 +19,11 @@ VNQa=adjustOHLC(VNQ)
 
 #####
 # Look at close-to-close changes
-plot(ClCl(MRKa))
+plot(ClCl(TLTa))
+plot(ClCl(LQDa))
+plot(ClCl(SPYa))
+plot(ClCl(EEMa))
+plot(ClCl(VNQa))
 ####
 
 # Combine close to close changes in a single matrix
@@ -32,10 +36,10 @@ pairs(all_returns)
 plot(all_returns[,1], type='l')
 
 # Look at the market returns over time
-plot(all_returns[,3], type='l')
+plot(all_returns[,5], type='l')
 
 # An autocorrelation plot: nothing there
-acf(all_returns[,3])
+acf(all_returns[,5])
 
 # The sample correlation matrix
 cor(all_returns)
