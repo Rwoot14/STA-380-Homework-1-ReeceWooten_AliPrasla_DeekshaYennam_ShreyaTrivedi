@@ -24,6 +24,16 @@ figure
 # END
 #########
 
+green_buildings_25_not=subset(green_buildings_not_green, size<=260000 & size>=240000)
+green_buildings_25=subset(green_buildings_green, size<=260000 & size>=240000)
+
+x= median(green_buildings_25_not$Rent)
+median(green_buildings_25$Rent)
+
+cat('refs',x)
+print('')
+median(green_buildings_green$Rent)
+
 #########
 # Regressions SPARSE=BEST ONE
 #########
@@ -116,16 +126,110 @@ figure
 #########
 # TRYING TO ADD A LEGEND :(
 #########
-figure=ggplot()+ 
-  geom_point(data=green_buildings_not_green,aes(y=Rent,x=leasing_rate,color='Non_green_buildings'))+
-  geom_point(data=green_buildings_green,aes(y=Rent,x=leasing_rate,color='Green_Buildings'))+
-  figure+scale_colour_manual(name="Line Color",
-                    values=c('Non_green_buildings'="snow3", 'Green_Buildings'="olivedrab4"))
+green=median(green_buildings_green$Rent)
+not=median(green_buildings_not_green$Rent)
+figure=ggplot()
+figure=figure+geom_histogram(data=green_buildings,aes(x= Rent))
+figure=figure+geom_histogram(data=green_buildings_green,aes(x=Rent),fill='red')
+figure=figure+geom_vline(xintercept = not,color='blue')
+figure=figure+geom_vline(xintercept = green,color='red')
+figure
+
+############
+# HIST. WITH 2 LEGENDS :)
+############
+figure=ggplot()+ ggtitle('Rent Vs. Age')+
+  geom_histogram(data=green_buildings_not_green, aes(x=Rent, fill='Non green buildings'))+
+  geom_histogram(data=green_buildings_green,aes(x=Rent,fill='Green Buildings'))+geom_vline(aes(xintercept = not,color='Non green buildings median rent'))+geom_vline(aes(xintercept = green,color='Green buildings median rent'))+
+  scale_fill_manual(name="Bar Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4','Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')+
+  scale_color_manual(name="Line Color",
+                     values=c('Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')
+figure
+##########
+# END
+##########
+
+##########
+# CONTINUE PLOTS WITH LEGENDS
+########
+figure=ggplot()+ ggtitle('Rent Vs. Age')+
+  geom_point(data=green_buildings_not_green, aes(y=Rent,x=age, color='Non green buildings'))+
+  geom_point(data=green_buildings_green,aes(y=Rent,x=age,color='Green Buildings'))+
+  scale_colour_manual(name="Dot Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
+figure
+
+figure=ggplot()+ ggtitle('Rent Vs. Cluster Rent')+
+  geom_point(data=green_buildings_not_green, aes(y=Rent,x=cluster_rent, color='Non green buildings'))+
+  geom_point(data=green_buildings_green,aes(y=Rent,x=cluster_rent,color='Green Buildings'))+
+  scale_colour_manual(name="Dot Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
+figure
+
+figure=ggplot()+ ggtitle('Rent Vs. Electricity Costs')+
+  geom_point(data=green_buildings_not_green, aes(y=Rent,x=Electricity_Costs, color='Non green buildings'))+
+  geom_point(data=green_buildings_green,aes(y=Rent,x=Electricity_Costs,color='Green Buildings'))+
+  scale_colour_manual(name="Dot Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
+figure
+
+figure=ggplot()+ ggtitle('Rent Vs. Leasing_rate')+
+  geom_point(data=green_buildings_not_green, aes(y=Rent,x=leasing_rate, color='Non green buildings'))+
+  geom_point(data=green_buildings_green,aes(y=Rent,x=leasing_rate,color='Green Buildings'))+
+  scale_colour_manual(name="Dot Color",
+                    values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
 figure
 #########
 #
 ########
 
+ggplot(Rent,aes(x=class_a,y=value,fill=factor(gender)))+
+  geom_bar(stat="identity",position="dodge")+
+  scale_fill_discrete(name="Gender",
+                      breaks=c(1, 2),
+                      labels=c("Male", "Female"))+
+  xlab("Beverage")+ylab("Mean Percentage")
+
+#median dataFrame by class
+
+#############
+# PLOTS TO ADD
+#############
+#############
+# ALI's MASTER PLOT CODE 
+#############
+library(dplyr)
+library(reshape2)
+mediansGreen = green_buildings_green %>% group_by(class_a) %>% summarise(median = median(Rent))
+mediansNotGreen = green_buildings_not_green %>% group_by(class_a) %>% summarise(median = median(Rent))
+
+
+medians = cbind(mediansGreen,mediansNotGreen)
+
+colnames(medians) = c("class_a","median_green","class_a","median_not_green")
+medians = medians[,2:ncol(medians)]
+
+
+medians = melt(medians,id = "class_a")
+figure=ggplot(medians,aes(x = class_a,y = value, fill = variable)) + geom_col(position = "dodge")
+figure
+############
+# HIST. WITH 2 LEGENDS :)
+############
+green=median(green_buildings_green$Rent)
+not=median(green_buildings_not_green$Rent)
+figure=ggplot()+ ggtitle('Rent Counts')+
+  geom_histogram(data=green_buildings_not_green, aes(x=Rent, fill='Non green buildings'))+
+  geom_histogram(data=green_buildings_green,aes(x=Rent,fill='Green Buildings'))+geom_vline(aes(xintercept = not,color='Non green buildings median rent'))+geom_vline(aes(xintercept = green,color='Green buildings median rent'))+
+  scale_fill_manual(name="Bar Color",
+                    values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4','Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')+
+  scale_color_manual(name="Line Color",
+                     values=c('Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')+
+figure
+##########
+# END
+##########
 ##############
 # END
 ##############
