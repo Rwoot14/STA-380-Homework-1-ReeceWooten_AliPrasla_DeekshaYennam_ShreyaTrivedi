@@ -14,7 +14,7 @@ library(ggplot2)
 
 In this study, we evaluate the economic impact of "going green" on a latest project for an Austin real-estate developer. We consider the recommendations made by the developer's stats guru and establish whether or not he was right by doing some exploratory data analysis on the greenbuildings dataset.
 
-```{r}
+```{r include=FALSE}
 green_buildings=read.csv("C:/Users/deeks/Desktop/Summer/Intro to Predictive Modeling/James/STA380_clone/STA380/data/greenbuildings.csv")
 
 green_buildings$cluster=factor(green_buildings$cluster)
@@ -36,9 +36,10 @@ Below is a histogram of the occupancy rates of the various buildings in the data
 
 ```{r}
 breaks = seq(0,100,10)
-figure=ggplot()
-figure=figure+geom_histogram(data=green_buildings,aes(x= leasing_rate),fill='snow3',color='white',breaks=breaks)
-figure=figure+geom_histogram(data=green_buildings_green,aes(x=leasing_rate),fill='seagreen',color='black',breaks=breaks)+scale_x_continuous(breaks = breaks)
+figure=ggplot()+ggtitle('Leasing Rate Histogram')+
+       geom_histogram(data=green_buildings_not_green,aes(x= leasing_rate),fill='snow3',color='white',breaks=breaks)+
+       geom_histogram(data=green_buildings_green,aes(x=leasing_rate),fill='olivedrab4',color='black',breaks=breaks)+
+       scale_x_continuous(breaks = breaks)
 figure
 ```
 
@@ -49,39 +50,66 @@ Our recommendation is to not exclude the buildings with less than 10% occupancy 
 
 The stats guru looked at the green buildings and non-green buildings separately and calculated median market rents for both categories.Below is a histogram of the rents of all buildings.
 
-We can see that there are some outliers whose rent exceeds $125 per sq.ft. and he was right in calculating the median rent instead of mean as the median is more robust to outliers. However, he should have taken the potential confounding effects of other variables into account before concluding that green buildings fetch higher rents.
-
 ```{r}
 green=median(green_buildings_green$Rent)
 not=median(green_buildings_not_green$Rent)
-figure=ggplot()
-figure=figure+geom_histogram(data=green_buildings,aes(x= Rent))
-figure=figure+geom_histogram(data=green_buildings_green,aes(x=Rent),fill='seagreen')
-figure=figure+geom_vline(xintercept = not,color='blue')
-figure=figure+geom_vline(xintercept = green,color='seagreen')
+figure=ggplot()+ ggtitle('Rent Vs. Age')+
+  geom_histogram(data=green_buildings_not_green, aes(x=Rent, fill='Non green buildings'))+
+  geom_histogram(data=green_buildings_green,aes(x=Rent,fill='Green Buildings'))+geom_vline(aes(xintercept = not,color='Non green buildings median rent'))+geom_vline(aes(xintercept = green,color='Green buildings median rent'))+
+  scale_fill_manual(name="Bar Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4','Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')+
+  scale_color_manual(name="Line Color",
+                     values=c('Non green buildings median rent'='dimgray', 'Green buildings median rent'='darkseagreen2'),guide='legend')
 figure
 ```
 
 
+We can see that there are some outliers whose rent exceeds $125 per sq.ft. and he was right in calculating the median rent instead of mean as the median is more robust to outliers. But, we cannot conclude that green buildings fetch higher rent just by looking at the difference in median rents between green and non-green buildings.
 
-The stats guru's analysis ignores the possibility of interactions between green rating of a building and the various other variables that also affect the rents of buildings like age, renovated, class of building quality etc. 
-
-The fact that green buildings seem to have higher median rents only establishes correlation between rent and green rating. It does not establish causality.
-
-To see the effect of green rating of a building on rents, we need to control for the other variables that are correlated with green rating. A multiple regression model can explain this.
+For example, if we look at the median value of rents for green vs. non-green buildings which are between 240,000-260,000 sqft in size, we notice that median rent for green buildings is actually lower than non-green buildings by $2.06 per sq.ft.
 
 ```{r}
-fit_all=glm(Rent~.-cluster,data=green_buildings)
+green_buildings_25=subset(green_buildings_green, size<=260000 & size>=240000)
+cat('Median value for green buildings in the 24k-26k sqft size range =',median(green_buildings_25$Rent))
+```
+
+```{r}
+green_buildings_25_not=subset(green_buildings_not_green, size<=260000 & size>=240000)
+cat('Median value for non-green buildings in the 24k-26k sqft size range =',median(green_buildings_25_not$Rent))
+```
+
+
+The stats guru's analysis ignores the possibility of interactions between green rating of a building and the various other variables that also affect the rents of buildings like age, renovated, class of building quality etc. The fact that green buildings seem to have higher median rents only establishes correlation between rent and green rating. It does not establish causality. The scatter plots below can help illustrate this effect.
+
+```{r}
+figure=ggplot()+ ggtitle('Rent Vs. Age')+
+  geom_point(data=green_buildings_not_green, aes(y=Rent,x=age, color='Non green buildings'))+
+  geom_point(data=green_buildings_green,aes(y=Rent,x=age,color='Green Buildings'))+
+  scale_colour_manual(name="Dot Color",
+                      values=c('Non green buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
+figure
+```
+
+In the above scatter plot, we can see that the green buildings are clustered around low age, which is understandable since the concept of a 'green' building is relatively new. And we can also see that new buildings have slightly higher rents than the older buildings, if we ignore outliers. So, a portion of the high rents we see in green buildings is probably only because they are new and not because they are green. 
+
+
+
+To see the effect of green rating of a building on rents, we need to control for the other variables that are correlated with green rating. A multiple regression model of Rent on the factors can explain this.
+
+```{r}
+fit_all=glm(Rent~.-cluster -LEED -Energystar -total_dd_07,data=green_buildings)
 summary(fit_all)
 ```
 
-The stats guru also assumed that the rent per sqft is not affected by the size of the building. He just calculated the median value of rents per sqft for all the buildings and multiplied the additional median value for green buildings with the square footage of the building. Below chart shows a plot of the Rent per sq.ft. for a building as a function of the total sqare footage of the building. We see that bigger buildings tend to have a higher per sq.ft rent. So, we would be able to get a realistic figure if we included the size of the building into our rent estimate.
+From the summary of the linear model fit, we can see that green rating of a building is not at all significant factor in determining the rent of the building.
+
+The stats guru also assumed that the rent per sqft is not affected by the size of the building. He just calculated the median value of rents per sqft for all the buildings and multiplied the additional median value for green buildings with the square footage of the building. Below chart shows a plot of the Rent per sq.ft. for a building as a function of the total square footage of the building. We see that bigger buildings tend to have a higher per sq.ft rent. So, we would be able to get a realistic figure if we included the size of the building into our rent estimate.
 
 ```{r}
-breaks=seq(0,100)
-figure=ggplot()+ggtitle('Rent Vs. Age')
-figure=figure+geom_point(data=green_buildings_not_green,aes(y=Rent,x=size),color='snow3')
-figure=figure+geom_point(data=green_buildings_green,aes(y=Rent,x=size),color='olivedrab4')+scale_colour_manual(name="Dot Color",values=c('Non_green_buildings'="snow3", 'Green_Buildings'="olivedrab4"))
+figure=ggplot()+ggtitle('Rent Vs. Size')+
+       geom_point(data=green_buildings_not_green,aes(y=Rent,x=size,color='Non_green_buildings'))+
+       geom_point(data=green_buildings_green,aes(y=Rent,x=size,color='Green_buildings'))+
+       scale_colour_manual(name="DotColor",values=c('Non_green_buildings'='snow3','Green_buildings'='olivedrab4'),guide='legend')
 figure
 ```
 
@@ -89,24 +117,4 @@ According to the stats expert, "Our expected baseline construction costs are $10
 
 The above calculation assumes that the rent earned on the building will not change as the building becomes older. Rent earned on a ten year old building will not be the same as the rent earned on a new building. The calculation does not also take into account the time value of money.
 
-In conclusion, the stats "guru" overly simplified the problem at hand and ignored a lot of factors that affect the rent earned on a building. If we build in all of the relevant factors from the model listed in the dataset into our estimate of a building's rent, we will notice that a building's green rating is not a statistically significant factor in determining the rent earned on the building and will not on its own translate into any significant economic benefits to the real-estate developer.
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+In conclusion, the stats "guru" overly simplified the problem at hand and ignored a lot of factors that affect the rent earned on a building. If we build in all of the relevant factors listed in the dataset into our estimate of a building's rent, we will notice that a building's green rating is not a statistically significant factor in determining the rent earned on the building and will not on its own translate into any significant economic benefit to the real-estate developer.
