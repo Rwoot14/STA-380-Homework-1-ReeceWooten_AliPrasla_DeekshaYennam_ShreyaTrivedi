@@ -1,3 +1,6 @@
+-   [Exercise One:](#exercise-one)
+    -   [Authors:](#authors)
+    -   [Date:](#date)
 -   [Bayesian Problems:](#bayesian-problems)
     -   [Part A:](#part-a)
     -   [Part B.](#part-b.)
@@ -8,6 +11,17 @@
     -   [Economic Benefit Calculation](#economic-benefit-calculation)
 -   [Portfolio Bootstrapping](#portfolio-bootstrapping)
 -   [NutrientH20 Market Segmentation](#nutrienth20-market-segmentation)
+
+Exercise One:
+-------------
+
+### Authors:
+
+Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yellam
+
+### Date:
+
+August 12, 2017
 
 Bayesian Problems:
 ------------------
@@ -20,23 +34,23 @@ TC = True Choice Event
 
 Y = "Yes" Choice Event
 
-$N = "No" Choice Event$
+N = "No" Choice Event
 
 #### Solve for *P*(*Y*/*T**C*)
 
-*P*(*Y*/*T**C*)=*P*(*Y**n**T**C*)/*P*(*T**C*)
+P(Y/TC) = P(Y n TC) / P(TC)
 
-*P*(*T**C*)=.7
+P(TC) = .7
 
-*P*(*Y**n**T**C*)=*P*(*Y*)−*P*(*Y**n**R**C*)
+P(Y n TC) = P(Y) - P(Y n RC)
 
-*P*(*Y*)=.65
+P(Y) = .65
 
-*P*(*Y**n**R**C*)=*P*(*R**C*)\**P*(*Y*/*R**C*)
+P(Y n RC) = P(RC) \* P(Y/RC)$
 
-*P*(*R**C*)=.3
+P(RC) = .3
 
-*P*(*Y*/*R**C*)=.5
+P(Y/RC) = .5
 
 P(Y n RC) =
 
@@ -68,19 +82,19 @@ YAndTC/.7
 
 ### Part B.
 
-*P* = *P**o**s**i**t**i**v**e**T**e**s**t**E**v**e**n**t* *D* = *H**a**s**D**i**s**e**a**s**e**E**v**e**n**t*
+P = Positive Test Event D = Has Disease Event
 
 #### Solve for *P*(*D*/*P*)
 
-*P*(*D*/*P*)=(*P*(*P*/*D*)\**P*(*D*))/*P*(*P*) *P*(*P*/*D*)=.993 *P*(*D*)=.000025 *P*(*P*)=*P*(*P**n**D*)+*P*(*P**n**D*<sup>*c*</sup>)
+P(D/P) = (P(P/D) \* P(D))/P(P) P(P/D) = .993 P(D) = .000025 P(P) = P(P n D) + P(P n D^c)
 
-*P*(*P**n**D*)=*P*(*P*/*D*)\**P*(*D*)
+P(P n D) = P(P/D) \* P(D)
 
 ``` r
 PAndD = .993 * .000025
 ```
 
-*P*(*P**n**D*<sup>*c*</sup>)=*P*(*P*/*D*<sup>*c*</sup>)\**P*(*D*<sup>*c*</sup>) *P*(*P*/*D*<sup>*c*</sup>)=(1 − .9999)
+P(P n D^c) = P(P/D^c) \* P(D<sup>c)\\ P(P/D</sup>c) = (1 - .9999)
 
 ``` r
 PAndNotD = (1-.9999) * (1-.000025)
@@ -784,19 +798,19 @@ withoutChatter
     ##           CH Score Fit     
     ## result.1  1179.097 400.9804
     ## result.2  1179.097 400.9804
-    ## result.3  974.6298 369.5526
-    ## result.4  937.2596 339.7262
-    ## result.5  922.9332 313.8751
+    ## result.3  969.2385 369.9585
+    ## result.4  932.9353 340.139 
+    ## result.5  922.9333 313.8751
     ## result.6  905.3025 292.7372
-    ## result.7  861.3994 278.3183
+    ## result.7  861.399  278.3183
     ## result.8  809.714  268.0368
     ## result.9  775.219  257.8584
-    ## result.10 735.2165 250.4552
-    ## result.11 697.3207 244.4301
+    ## result.10 718.3398 253.1086
+    ## result.11 697.3211 244.4301
     ## result.12 665.9535 238.7492
-    ## result.13 637.5765 233.7286
-    ## result.14 602.4883 231.0133
-    ## result.15 576.6154 227.5166
+    ## result.13 637.5775 233.7285
+    ## result.14 607.0837 230.1376
+    ## result.15 576.9783 227.4441
 
 ``` r
 par(bg = "gray")

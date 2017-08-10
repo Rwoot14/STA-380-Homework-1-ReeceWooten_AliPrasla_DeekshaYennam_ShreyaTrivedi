@@ -7,6 +7,14 @@ output:
     variant: markdown_github
     toc: true
 ---
+## Exercise One:
+
+###Authors:
+
+Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yellam
+
+###Date:
+August 12, 2017
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -22,23 +30,23 @@ TC = True Choice Event
 
 Y = "Yes" Choice Event
 
-$N = "No" Choice Event$
+N = "No" Choice Event
 
 ####Solve for $P(Y/TC)$
 
-$P(Y/TC) = P(Y n TC) / P(TC)$
+P(Y/TC) = P(Y n TC) / P(TC)
 
-$P(TC) = .7$
+P(TC) = .7
 
-$P(Y n TC) = P(Y) - P(Y n RC)$
+P(Y n TC) = P(Y) - P(Y n RC)
 
-$P(Y) = .65$
+P(Y) = .65
 
-$P(Y n RC) = P(RC) * P(Y/RC)$
+P(Y n RC) = P(RC) * P(Y/RC)$
 
-$P(RC) = .3$
+P(RC) = .3
 
-$P(Y/RC) = .5$
+P(Y/RC) = .5
 
 P(Y n RC) = 
 ```{r}
@@ -62,23 +70,23 @@ YAndTC/.7
 ```
 
 ### Part B.
-$P = Positive Test Event$
-$D = Has Disease Event$
+P = Positive Test Event
+D = Has Disease Event
 
 ####Solve for $P(D/P)$
 
-$P(D/P) = (P(P/D) * P(D))/P(P)$
-$P(P/D) = .993$
-$P(D) = .000025$
-$P(P) = P(P n D) + P(P n D^c)$
+P(D/P) = (P(P/D) * P(D))/P(P)
+P(P/D) = .993
+P(D) = .000025
+P(P) = P(P n D) + P(P n D^c)
 
-$P(P n D) = P(P/D) * P(D)$
+P(P n D) = P(P/D) * P(D)
 ```{r}
 PAndD = .993 * .000025
 ```
 
-$P(P n D^c) = P(P/D^c) * P(D^c)$
-$P(P/D^c) = (1 - .9999)$
+P(P n D^c) = P(P/D^c) * P(D^c)
+P(P/D^c) = (1 - .9999)
 ```{r}
 PAndNotD = (1-.9999) * (1-.000025)
 ```
