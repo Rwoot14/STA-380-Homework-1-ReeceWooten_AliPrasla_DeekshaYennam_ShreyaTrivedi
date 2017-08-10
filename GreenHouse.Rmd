@@ -15,7 +15,7 @@ library(ggplot2)
 In this study, we evaluate the economic impact of "going green" on a latest project for an Austin real-estate developer. We consider the recommendations made by the developer's stats guru and establish whether or not he was right by doing some exploratory data analysis on the greenbuildings dataset.
 
 ```{r include=FALSE}
-green_buildings=read.csv("C:/Users/deeks/Desktop/Summer/Intro to Predictive Modeling/James/STA380_clone/STA380/data/greenbuildings.csv")
+green_buildings=read.csv("greenbuildings.csv")
 
 green_buildings$cluster=factor(green_buildings$cluster)
 attach(green_buildings)
