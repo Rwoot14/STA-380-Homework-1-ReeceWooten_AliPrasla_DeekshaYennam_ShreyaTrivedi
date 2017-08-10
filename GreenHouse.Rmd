@@ -8,6 +8,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(mosaic)
 library(ggplot2)
+library(dplyr)
+library(reshape2)
 ```
 
 # QUESTION 2 - EXPLORATORY ANALYSIS- GREEN BUILDINGS
@@ -37,9 +39,11 @@ Below is a histogram of the occupancy rates of the various buildings in the data
 ```{r}
 breaks = seq(0,100,10)
 figure=ggplot()+ggtitle('Leasing Rate Histogram')+
-       geom_histogram(data=green_buildings_not_green,aes(x= leasing_rate),fill='snow3',color='white',breaks=breaks)+
-       geom_histogram(data=green_buildings_green,aes(x=leasing_rate),fill='olivedrab4',color='black',breaks=breaks)+
-       scale_x_continuous(breaks = breaks)
+       geom_histogram(data=green_buildings_not_green,aes(x= leasing_rate,fill='Non Green Buildings'),color='white',breaks=breaks)+
+       geom_histogram(data=green_buildings_green,aes(x=leasing_rate,fill='Green Buildings'),color='black',breaks=breaks)+
+       scale_x_continuous(breaks = breaks)+
+  scale_fill_manual(name="Bar Color",
+                    values=c('Non Green Buildings'='snow3', 'Green Buildings'='olivedrab4'),guide='legend')
 figure
 ```
 
@@ -53,7 +57,7 @@ The stats guru looked at the green buildings and non-green buildings separately 
 ```{r}
 green=median(green_buildings_green$Rent)
 not=median(green_buildings_not_green$Rent)
-figure=ggplot()+ ggtitle('Rent Vs. Age')+
+figure=ggplot()+ ggtitle('Histogram of Rent')+
   geom_histogram(data=green_buildings_not_green, aes(x=Rent, fill='Non green buildings'))+
   geom_histogram(data=green_buildings_green,aes(x=Rent,fill='Green Buildings'))+geom_vline(aes(xintercept = not,color='Non green buildings median rent'))+geom_vline(aes(xintercept = green,color='Green buildings median rent'))+
   scale_fill_manual(name="Bar Color",
@@ -92,9 +96,26 @@ figure
 
 In the above scatter plot, we can see that the green buildings are clustered around low age, which is understandable since the concept of a 'green' building is relatively new. And we can also see that new buildings have slightly higher rents than the older buildings, if we ignore outliers. So, a portion of the high rents we see in green buildings is probably only because they are new and not because they are green. 
 
+We also observed that there is a high correlation between the construction class of buildings and the green rating. Close to 80% of the green buildings fall under class 'A'. Below chart shows a comparison of the median rent values by class and green rating. We see that class A buildings get higher rent than non-class A buildings. But there is no difference between the rents for a green vs. non-green class A building. 
+
+```{r}
+
+mediansGreen = green_buildings_green %>% group_by(class_a) %>% summarise(median = median(Rent))
+mediansNotGreen = green_buildings_not_green %>% group_by(class_a) %>% summarise(median = median(Rent))
 
 
-To see the effect of green rating of a building on rents, we need to control for the other variables that are correlated with green rating. A multiple regression model of Rent on the factors can explain this.
+medians = cbind(mediansGreen,mediansNotGreen)
+
+colnames(medians) = c("class_a","median_green","class_a","median_not_green")
+medians = medians[,2:ncol(medians)]
+medians = melt(medians,id = "class_a")
+breaks=seq(0,1,1)
+figure=ggplot(medians,aes(x = class_a,y = value,fill=variable)) + geom_col(position = "dodge")+ ggtitle('Class_A Vs. Median Rent')+
+  scale_fill_manual(values=c("olivedrab4", "snow3")) + scale_x_discrete() + geom_text(x = 0,y = 26.5,label = "Not Class A") + geom_text(x = 1,y = 29.2,label = "Class A")+ylab('Median Rent')
+figure
+```
+
+To see the effect of green rating of a building on rents, we need to control for the other variables that are correlated with green rating. A multiple regression model of Rent on the factors can explain this. We dropped factors like cluster, LEED, Energystar and total_dd_07 from the linear model, because these variables do not add any extra information than what is already in the other variables.
 
 ```{r}
 fit_all=glm(Rent~.-cluster -LEED -Energystar -total_dd_07,data=green_buildings)
