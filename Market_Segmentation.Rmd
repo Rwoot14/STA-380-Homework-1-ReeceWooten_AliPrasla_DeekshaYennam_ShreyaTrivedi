@@ -20,56 +20,71 @@ Goal of Data Analysis: Find categories preferred by users so that NutrientH20 ca
 Solution: Find the percentage of tweets per category, scale and find the most prominent clusters.
 
 
-First, change the data frame total tweet numbers to fractions.
+First, change the data frame total tweet numbers to fractions and drop the chatter column. We decided to drop the chatter column because of that column's inability to help shape our marketing message. Because a large number of tweets are characterized as "chatter", this would merely add noise to our clustering model and fail to provide interpretable results.
 ```{r}
 df$X = NULL
 df = data.frame(as.matrix(df)/rowSums(as.matrix(df)))
+tempDf = df
+#drop chatter 
+tempDf$chatter= NULL
 head(df)
 ```
 
-```{r}
-#set up parralel computing
+
+Second, let's load the libraries required. This includes registering parallel computing.
+```{r include = FALSE}
+#set up parallel computing
 library(foreach)
 library(doParallel)
 library(LICORS)
 library(clusterCrit)
-##register parralel backend
+##register parallel backend
 registerDoParallel(cores = 4)
 ```
 
+
+Next, run a function _ClusterTweeters_. That function, given a K and a dataframe will return the CH score of all that model. _withoutChatter_ is a matrix with the CH score and SSE(tot) of all the models tested between k = 1 and k = 15. This step included **%dopar%** to tell the foreach loop to compute the results in parallel.
 ```{r}
 clusterTweeters = function(numK,df){
   model = LICORS::kmeanspp(as.matrix(df), k = numK,nstart = 10)
   #find ch value for the model
-  clusterCrit::intCriteria(as.matrix(df),model$cluster,"Calinski_Harabasz")
+  c(clusterCrit::intCriteria(as.matrix(df),model$cluster,"Calinski_Harabasz"),model$tot.withinss)
 }
-tempDf = df
-#drop chatter 
-tempDf$chatter= NULL
-withoutChatter = foreach(k = 2:10,.combine = 'c')%dopar%
+
+withoutChatter = foreach(k = 1:15,.combine = 'rbind')%dopar%
 {
   clusterTweeters(k,tempDf)
 }
-
+colnames(withoutChatter) = c('CH Score','Fit')
+withoutChatter
 ```
+
+
 
 
 
 ```{r}
 par(bg = "gray")
-plot(2:10,withoutChatter,main = "K selections versus CH Score",xlab = "K",ylab = "CH Score",type = "l",col = "red")
+plot(1:nrow(withoutChatter),withoutChatter[,2],col = "red",main = "Fit vs. K",type = "l",xlab = "K",ylab = "SSE (tot)")
+```
+Using the elbow method, there is no clear shift in slope of the line as K increases. This curve looks closer to an exponential decay than an elbow. The elbow method, therefore, is not a good metric of choosing the optimal number of market segments. A heuristic such as CH score could find a better optimal K.
+
+Let's plot the CH scores of all the models tested. 
+```{r}
+par(bg = "gray")
+plot(1:nrow(withoutChatter),withoutChatter[,1],main = "K selections versus CH Score",xlab = "K",ylab = "CH Score",type = "l",col = "red")
 abline(v = (which.max(withoutChatter)+1),col = "blue",lw = 2)
 ```
+CH score indicates two optimal market segments. We believe that this is the best metric for determining the clusters because of the fit vs. simplicity trade off inherent within the heuristic and it's clear answer: two segments.
 
 
-After dropping chatter from the data set (because of it's inability to direct NutrientH20's marketing message), K-means was conducted to determine market segmentation. We optimized for the number of segments that resulted in the best CH score. K = 2 for that segmentation. See chart above.
 
 Next, let's analyze the important components of that each cluster. In other words, for each cluster's centriod, let's look for the centriod with the highest value.
 
 ```{r}
 optimalModel = LICORS::kmeanspp(tempDf, (which.max(withoutChatter)+1),nstart = 10)
 #plot parameters for each model
-topN = 7
+topN = 5
 centriodMat = matrix(NA,2,topN)
 par(bg = "gray",mfrow = c(2,1))
 for (k in 1:2)
@@ -88,7 +103,9 @@ The one of the clusters looks to be composed of people who are very concious of 
 length(which(optimalModel$cluster == 1))/length(optimalModel$cluster)
 ```
 
-The second cluster appears to be grouped for millenials. Politically engage(current_events and politics), educated (college_uni) and active in photo sharing, this could be a young group of people. We would need to dig more into the profiles of this segment, but a marketing strategy focused on millenials could be appropriate. This clusters contains this fraction of social media users:
+The second cluster appears to be grouped for millenials. Politically engaged(current_events and politics), educated (college_uni) and active in photo sharing, this could be a young group of people. We would need to dig more into the profiles of this segment, but a marketing strategy focused on millenials could be appropriate. A visually appealing marketing campaign would be attractive to these social media followers.
+
+This clusters contains this fraction of social media users:
 
 ```{r}
 length(which(optimalModel$cluster == 2))/length(optimalModel$cluster)
