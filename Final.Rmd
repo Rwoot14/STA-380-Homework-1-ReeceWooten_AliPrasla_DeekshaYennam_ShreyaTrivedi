@@ -3,7 +3,8 @@ title: "Exercise One"
 author: "Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yellam"
 date: "August 10, 2017"
 output: 
-  html_document:
+  md_document:
+    variant: markdown_github
     toc: true
 ---
 
@@ -15,11 +16,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ###Part A:
 
-$RC = Random Choice Event$
+RC = Random Choice Event
 
-$TC = True Choice Event$
+TC = True Choice Event
 
-$Y = "Yes" Choice Event$
+Y = "Yes" Choice Event
 
 $N = "No" Choice Event$
 
@@ -91,7 +92,7 @@ $P(D / P) = $
 print((.993 * .000025) / P)
 ```
 
-Yes. We foresee problems with universial testing. This test effectively has a 20% false positive rate. Yet, to determine whether or not to implement this policy, it is important to look at other factors, like the deadliness of the disease and the efficacy of early treatment. 
+Yes. We foresee problems with universal testing. This test effectively has a 20% false positive rate. Yet, to determine whether or not to implement this policy, it is important to look at other factors, like the deadliness of the disease and the efficacy of early treatment. 
 
 
 
@@ -104,7 +105,7 @@ library(reshape2)
 
 ## Green Buildings
 
-In this study, we evaluate the economic impact of "going green" on a latest project for an Austin real-estate developer. We consider the recommendations made by the developer's stats guru and establish whether or not he was right by doing some exploratory data analysis on the greenbuildings dataset.
+In this study, we evaluate the economic impact of "going green" on a latest project for an Austin real-estate developer. We consider the recommendations made by the developer's stats guru and establish whether or not he was right by doing some exploratory data analysis on the green buildings dataset.
 
 ```{r include=FALSE}
 green_buildings=read.csv("greenbuildings.csv")
@@ -232,7 +233,7 @@ According to the stats expert, "Our expected baseline construction costs are $10
 The above calculation assumes that the rent earned on the building will not change as the building becomes older. Rent earned on a ten year old building will not be the same as the rent earned on a new building. The calculation does not also take into account the time value of money.
 
 
-In conclusion, the stats "guru" overly simplified the problem at hand and ignored a lot of factors that affect the rent earned on a building. If we build in all of the relevant factors listed in the dataset into our estimate of a building's rent, we will notice that a building's green rating is not a statistically significant factor in determining the rent earned on the building and will not on its own translate into any significant economic benefit to the real-estate developer.
+In conclusion, the stats "guru" overly simplified the problem at hand and ignored a lot of factors that affect the rent earned on a building. If we build in all of the relevant factors listed in the data set into our estimate of a building's rent, we will notice that a building's green rating is not a statistically significant factor in determining the rent earned on the building and will not on its own translate into any significant economic benefit to the real-estate developer.
 
 
 
@@ -292,7 +293,7 @@ all_returns = cbind(ClCl(SPYa),ClCl(TLTa),ClCl(LQDa),ClCl(EEMa),ClCl(VNQa))
 all_returns = as.matrix(na.omit(all_returns))
 ```
 
-We calculated the sharpe ratio of individual stocks.
+We calculated the Sharpe ratio of individual stocks.
 
 ```{r}
 summary_stocks = cbind(t(t(colMeans(all_returns))),t(t(apply(all_returns,2,sd))))
@@ -405,7 +406,7 @@ quantile(sim1[,n_days], 0.05) - initial_wealth
 
 Hence for this portfolio the average return is $100531 and value at risk is $3066.526
 
-4) Next we will create an aggressive portfolio which increases our return as well as our risk. Ater trying several combinations, below is the weight we considered for this portfolio:
+4) Next we will create an aggressive portfolio which increases our return as well as our risk. After trying several combinations, below is the weight we considered for this portfolio:
 
 TLT -  0%
 LQD -  0%
@@ -482,7 +483,7 @@ Goal of Data Analysis: Find categories preferred by users so that NutrientH20 ca
 Solution: Find the percentage of tweets per category, scale and find the most prominent clusters.
 
 
-First, change the data frame total tweet numbers to fractions and drop the chatter column. We decided to drop the chatter column because of that column's inability to help shape our marketing message. Because a large number of tweets are characterized as "chatter", this would merely add noise to our clustering model and fail to provide interpretable results.
+First, change the data frame total tweet numbers to fractions and drop the chatter column. We decided to drop the chatter column because of that column's inability to help shape our marketing message. Because a large number of tweets are characterized as "chatter", this would merely add noise to our clustering model and fail to provide interpret-able results.
 ```{r}
 df$X = NULL
 df = data.frame(as.matrix(df)/rowSums(as.matrix(df)))
@@ -505,7 +506,7 @@ registerDoParallel(cores = 4)
 ```
 
 
-Next, run a function _ClusterTweeters_. That function, given a K and a dataframe will return the CH score of all that model. _withoutChatter_ is a matrix with the CH score and SSE(tot) of all the models tested between k = 1 and k = 15. This step included **%dopar%** to tell the foreach loop to compute the results in parallel.
+Next, run a function _ClusterTweeters_. That function, given a K and a data frame will return the CH score of all that model. _withoutChatter_ is a matrix with the CH score and SSE(tot) of all the models tested between k = 1 and k = 15. This step included **%dopar%** to tell the foreach loop to compute the results in parallel.
 ```{r}
 clusterTweeters = function(numK,df){
   model = LICORS::kmeanspp(as.matrix(df), k = numK,nstart = 10)
@@ -560,13 +561,13 @@ print(paste("Top",topN,"important centriod indicators per cluster: "))
 print(centriodMat)
 ```
 
-The one of the clusters looks to be composed of people who are very concious of their health. They seem to be focused on Personal Fitness and are interested in the outdoors. This indicates a very physically active group of people and would recommend that the marketing message ought to be related to personal health. This cluster contains this fraction of social media users:
+The one of the clusters looks to be composed of people who are very conscious of their health. They seem to be focused on Personal Fitness and are interested in the outdoors. This indicates a very physically active group of people and would recommend that the marketing message ought to be related to personal health. This cluster contains this fraction of social media users:
 
 ```{r}
 length(which(optimalModel$cluster == 1))/length(optimalModel$cluster)
 ```
 
-The second cluster appears to be grouped for millenials. Politically engaged(current_events and politics), educated (college_uni) and active in photo sharing, this could be a young group of people. We would need to dig more into the profiles of this segment, but a marketing strategy focused on millenials could be appropriate. A visually appealing marketing campaign would be attractive to these social media followers.
+The second cluster appears to be grouped for millennials. Politically engaged(current_events and politics), educated (college_uni) and active in photo sharing, this could be a young group of people. We would need to dig more into the profiles of this segment, but a marketing strategy focused on millennials could be appropriate. A visually appealing marketing campaign would be attractive to these social media followers.
 
 This clusters contains this fraction of social media users:
 
