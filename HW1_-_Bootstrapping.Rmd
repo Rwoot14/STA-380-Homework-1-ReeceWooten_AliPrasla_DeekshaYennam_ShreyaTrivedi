@@ -77,7 +77,7 @@ cor(all_returns)
 ```
 
 2)
-Now we are going to create our first portfolio with even split. We will assign the weight of each asset as 20%. 
+Next we created our first portfolio with even split. We assigned the weight of each asset as 20%. 
 
 ```{r}
 initial_wealth = 100000
@@ -118,7 +118,7 @@ quantile(sim1[,n_days], 0.05) - initial_wealth
 Hence for this portfolio the average return is $100974.7 and value at risk is $6225.106 
 
 
-3) Now we are going to create a safer portfolio which reduces our risk. To create this portfolio, we first calculated the average returns and risk involved with each asset had we invested all our wealth into that portfolio. Based on the results we tried different combinations and came up with weights which increased the return of portfolio and minimized the risk involved. Below are the weights:
+3) Next we created a safer portfolio which reduces our risk. To create this portfolio, we first calculated the average returns and risk involved with each asset had we invested all our wealth into that portfolio. Based on the results we tried different combinations and came up with weights which increased the return of portfolio and minimized the risk involved. Below are the weights:
 TLT - 20%
 LQD - 30%
 SPY - 50%
@@ -162,7 +162,7 @@ quantile(sim1[,n_days], 0.05) - initial_wealth
 
 Hence for this portfolio the average return is $100600.2 and value at risk is $2899.006
 
-4) Next we will create an aggressive portfolio which increases our return as well as our risk. Ater trying several combinations, below is the weight we considered for this portfolio:
+4) Finally, we created an aggressive portfolio which increases our return as well as our risk. Ater trying several combinations, below is the weight we considered for this portfolio:
 
 TLT -  0%
 LQD -  0%
