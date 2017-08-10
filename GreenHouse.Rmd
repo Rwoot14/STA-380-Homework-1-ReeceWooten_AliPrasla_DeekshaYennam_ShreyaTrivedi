@@ -1,0 +1,112 @@
+---
+title: "GreenHouse"
+author: "Deeksha Yennam"
+date: "August 9, 2017"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mosaic)
+library(ggplot2)
+```
+
+# QUESTION 2 - EXPLORATORY ANALYSIS- GREEN BUILDINGS
+
+In this study, we evaluate the economic impact of "going green" on a latest project for an Austin real-estate developer. We consider the recommendations made by the developer's stats guru and establish whether or not he was right by doing some exploratory data analysis on the greenbuildings dataset.
+
+```{r}
+green_buildings=read.csv("C:/Users/deeks/Desktop/Summer/Intro to Predictive Modeling/James/STA380_clone/STA380/data/greenbuildings.csv")
+
+green_buildings$cluster=factor(green_buildings$cluster)
+attach(green_buildings)
+#######
+# CREATES NEW DATA SETS OF JUST GREEN/NON GREEN BUILDINGS
+######
+green_buildings_green=subset(green_buildings,green_rating==1)
+green_buildings_not_green=subset(green_buildings,green_rating==0)
+```
+
+
+
+#### Outliers
+
+One of the first assumptions made by the stats guru is that buildings which had very low occupancy rates are outliers and removing them from the dataset to avoid a potential distortion of the analysis.
+
+Below is a histogram of the occupancy rates of the various buildings in the dataset. We can see that there's a considerable number of buildings with less than 10% occupancy rate, including some green buildings. 
+
+```{r}
+breaks = seq(0,100,10)
+figure=ggplot()
+figure=figure+geom_histogram(data=green_buildings,aes(x= leasing_rate),fill='snow3',color='white',breaks=breaks)
+figure=figure+geom_histogram(data=green_buildings_green,aes(x=leasing_rate),fill='seagreen',color='black',breaks=breaks)+scale_x_continuous(breaks = breaks)
+figure
+```
+
+
+Our recommendation is to not exclude the buildings with less than 10% occupancy as they represent a non-negligible portion of the data. It is possible that our estimate of rents may get skewed if we eliminate this chunk of data.
+
+#### Market rent of Green buildings Vs Non-Green buildings
+
+The stats guru looked at the green buildings and non-green buildings separately and calculated median market rents for both categories.Below is a histogram of the rents of all buildings.
+
+We can see that there are some outliers whose rent exceeds $125 per sq.ft. and he was right in calculating the median rent instead of mean as the median is more robust to outliers. However, he should have taken the potential confounding effects of other variables into account before concluding that green buildings fetch higher rents.
+
+```{r}
+green=median(green_buildings_green$Rent)
+not=median(green_buildings_not_green$Rent)
+figure=ggplot()
+figure=figure+geom_histogram(data=green_buildings,aes(x= Rent))
+figure=figure+geom_histogram(data=green_buildings_green,aes(x=Rent),fill='seagreen')
+figure=figure+geom_vline(xintercept = not,color='blue')
+figure=figure+geom_vline(xintercept = green,color='seagreen')
+figure
+```
+
+
+
+The stats guru's analysis ignores the possibility of interactions between green rating of a building and the various other variables that also affect the rents of buildings like age, renovated, class of building quality etc. 
+
+The fact that green buildings seem to have higher median rents only establishes correlation between rent and green rating. It does not establish causality.
+
+To see the effect of green rating of a building on rents, we need to control for the other variables that are correlated with green rating. A multiple regression model can explain this.
+
+```{r}
+fit_all=glm(Rent~.-cluster,data=green_buildings)
+summary(fit_all)
+```
+
+The stats guru also assumed that the rent per sqft is not affected by the size of the building. He just calculated the median value of rents per sqft for all the buildings and multiplied the additional median value for green buildings with the square footage of the building. Below chart shows a plot of the Rent per sq.ft. for a building as a function of the total sqare footage of the building. We see that bigger buildings tend to have a higher per sq.ft rent. So, we would be able to get a realistic figure if we included the size of the building into our rent estimate.
+
+```{r}
+breaks=seq(0,100)
+figure=ggplot()+ggtitle('Rent Vs. Age')
+figure=figure+geom_point(data=green_buildings_not_green,aes(y=Rent,x=size),color='snow3')
+figure=figure+geom_point(data=green_buildings_green,aes(y=Rent,x=size),color='olivedrab4')+scale_colour_manual(name="Dot Color",values=c('Non_green_buildings'="snow3", 'Green_Buildings'="olivedrab4"))
+figure
+```
+
+According to the stats expert, "Our expected baseline construction costs are $100 million, with a 5% expected premium for green certification. Thus we should expect to spend an extra $5 million on the green building. Based on the extra revenue we would make, we would recuperate these costs in $5000000/650000 = 7.7 years. Even if our occupancy rate were only 90%, we would still recuperate the costs in a little over 8 years. Thus from year 9 onwards, we would be making an extra $650,000 per year in profit. Since the building will be earning rents for 30 years or more, it seems like a good financial move to build the green building."
+
+The above calculation assumes that the rent earned on the building will not change as the building becomes older. Rent earned on a ten year old building will not be the same as the rent earned on a new building. The calculation does not also take into account the time value of money.
+
+In conclusion, the stats "guru" overly simplified the problem at hand and ignored a lot of factors that affect the rent earned on a building. If we build in all of the relevant factors from the model listed in the dataset into our estimate of a building's rent, we will notice that a building's green rating is not a statistically significant factor in determining the rent earned on the building and will not on its own translate into any significant economic benefits to the real-estate developer.
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
