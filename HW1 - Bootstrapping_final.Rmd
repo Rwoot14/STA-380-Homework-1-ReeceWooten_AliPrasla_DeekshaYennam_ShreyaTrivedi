@@ -10,10 +10,10 @@ In this question we have explored below five asset classes:
 We have taken our data from 2007-01-01. After exploring the data we created three portfolios for these assets assuming we have notional $100,000 to invest in one of these portfolios.
 
 1)
-Firstly we explored the properties of five assets we are considering.
+Firstly, we explored the properties of five assets we are considering.
 
-Installing relevant libraries. Quantmode helps us to download several years of daily data on these ETFs.
-```{r}
+Installing relevant libraries. _Quantmod_ helps us to download several years of daily data on these ETFs.
+```{r include = FALSE}
 library(mosaic)
 library(quantmod)
 library(foreach)
@@ -21,7 +21,7 @@ library(foreach)
 
 
 Importing the stocks we are considering
-```{r}
+```{r include = FALSE}
 mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
 myprices = getSymbols(mystocks, from = "2007-01-01")
 ```
@@ -39,39 +39,36 @@ VNQa=adjustOHLC(VNQ)
 
 Looking at close-to-close changes
 ```{r}
-plot(ClCl(TLTa))
-plot(ClCl(LQDa))
-plot(ClCl(SPYa))
-plot(ClCl(EEMa))
-plot(ClCl(VNQa))
+par(bg = "gray")
+plot(ClCl(TLTa),main = "US Treasury Daily Returns",ylab = "Return",col = "navy")
+plot(ClCl(LQDa),main = "Investment Grade Corporate Bonds Daily Returns",ylab = "Return",col = "navy")
+plot(ClCl(SPYa),main = "S&P 500 Daily Returns",ylab = "Return",col = "navy")
+plot(ClCl(EEMa),main = "Emerging Market ETF Daily Returns",ylab = "Return",col = "navy")
+plot(ClCl(VNQa),main = "REIT Daily Returns",ylab = "Return",col = "navy")
 ``` 
 
 Combining close to close changes in a single matrix
 ```{r}
 all_returns = cbind(ClCl(SPYa),ClCl(TLTa),ClCl(LQDa),ClCl(EEMa),ClCl(VNQa))
-head(all_returns)
 all_returns = as.matrix(na.omit(all_returns))
+```
+
+We calculated the sharpe ratio of individual stocks.
+
+```{r}
+summary_stocks = cbind(t(t(colMeans(all_returns))),t(t(apply(all_returns,2,sd))))
+summary_stocks = cbind(summary_stocks,summary_stocks[,1]/summary_stocks[,2])
+colnames(summary_stocks) = c("Average Returns","ST.Dev of Returns","Sharpe Ratio")
+summary_stocks
 ```
 
 These returns can be viewed as draws from the joint distribution
 ```{r}
 pairs(all_returns)
 ```
-```{r}
-plot(all_returns[,1], type='l')
-```
 
-Looking at the market returns over time
-```{r}
-plot(all_returns[,5], type='l')
-```
 
-An autocorrelation plot: nothing there
-```{r}
-acf(all_returns[,5])
-```
-
-The sample correlation matrix
+The correlation matrix between stocks
 ```{r}
 cor(all_returns)
 ```
@@ -94,21 +91,23 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
     holdings = holdings + holdings*return.today
     total_wealth = sum(holdings)
     wealthtracker[today] = total_wealth
-    weights = c(0.2, 0.2, 0.2, 0.2, 0.2)
+    #rebalance portfolio
     holdings = weights * total_wealth
   }
   wealthtracker
 }
 
 head(sim1)
-hist(sim1[,n_days], 25)
+
 ```
 
 Profit/loss of our portfolio:
 
 ```{r}
+par(bg = "gray")
 mean(sim1[,n_days])
-hist(sim1[,n_days]- initial_wealth, breaks=30)
+hist(sim1[,n_days]- initial_wealth, breaks=30,main = "Histogram of Portfolio Returns",xlab = "End of Period Return",ylab = "Frequency",col = "blue")
+abline(v = mean(sim1[,n_days]) - initial_wealth,col = "red",lw = 3)
 ```
 
 Calculating 5% value at risk for this portfolio
@@ -117,7 +116,7 @@ Calculating 5% value at risk for this portfolio
 quantile(sim1[,n_days], 0.05) - initial_wealth
 ```
 
-Hence for this portfolio the average return is $100946.6 and value at risk is $6297.993
+Hence for this portfolio the average return is $100946.6 and value at risk is $6297.993  
 
 
 3) Now we are going to create a safer portfolio which reduces our risk. To create this portfolio, we first calculated the average returns and risk involved with each asset had we invested all our wealth into that portfolio. Based on the results we tried different combinations and came up with weights which increased the return of portfolio and minimized the risk involved. Below are the weights:
@@ -148,14 +147,16 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
 }
 
 head(sim1)
-hist(sim1[,n_days], 25)
+
 ```
 
 
 Profit/loss for this portfolio
 ```{r}
+par(bg = "gray")
 mean(sim1[,n_days])
-hist(sim1[,n_days]- initial_wealth, breaks=30)
+hist(sim1[,n_days]- initial_wealth, breaks=30,main = "Histogram of Portfolio Returns",xlab = "End of Period Return",ylab = "Frequency",col = "blue")
+abline(v = mean(sim1[,n_days]) - initial_wealth,col = "red",lw = 3)
 ```
 
 Calculating 5% value at risk
@@ -194,13 +195,15 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
 }
 
 head(sim1)
-hist(sim1[,n_days], 25)
+
 ```
 
 Profit/loss for this portfolio
 ```{r}
+par(bg = "gray")
 mean(sim1[,n_days])
-hist(sim1[,n_days]- initial_wealth, breaks=30)
+hist(sim1[,n_days]- initial_wealth, breaks=30,main = "Histogram of Portfolio Returns",xlab = "End of Period Return",ylab = "Frequency",col = "blue")
+abline(v = mean(sim1[,n_days]) - initial_wealth,col = "red",lw = 3)
 ```
 
 Calculating 5% value at risk
@@ -220,6 +223,6 @@ Mean Return - $100531
 Value at Risk - $3066.526 
 
 Portfolio 3 (Risky):
-Mean Return -101872.8
+Mean Return $101872.8
 Value at Risk - 12925.12 
 
