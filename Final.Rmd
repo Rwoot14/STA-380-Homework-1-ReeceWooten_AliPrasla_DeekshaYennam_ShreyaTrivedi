@@ -1,6 +1,6 @@
 ---
 title: "Exercise One"
-author: "Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yellam"
+author: "Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yennam"
 date: "August 10, 2017"
 output: 
   md_document:
@@ -11,7 +11,7 @@ output:
 
 ###Authors:
 
-Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yellam
+Ali Prasla, Shreya Trivedi, Reece Wooten, Deeksha Yennam
 
 ###Date:
 August 12, 2017
