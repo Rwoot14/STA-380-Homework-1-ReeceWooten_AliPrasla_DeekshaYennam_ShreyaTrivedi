@@ -134,6 +134,7 @@ sim1 = foreach(i=1:5000, .combine='rbind') %do% {
   n_days = 20
   wealthtracker = rep(0, n_days)
   for(today in 1:n_days) {
+    set.rseed(1)
     return.today = resample(all_returns, 1, orig.ids=FALSE)
     holdings = holdings + holdings*return.today
     total_wealth = sum(holdings)
